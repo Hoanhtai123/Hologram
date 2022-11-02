@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ví dụ Model Loader</title>
+    <link rel="icon" href="/ThreeJS_Example/learn-threejs-master/images/logo.svg" />
+    <link rel="stylesheet" href="/ThreeJS_Example/learn-threejs-master/css/style.css" />
+    <style>
+        #progressBarDiv {
+            font-size: 3rem;
+            color: #888;
+            display: block;
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <canvas id="webglOutput"></canvas>
+
+    <div id="progressBarDiv">
+        Loading...
+    </div> -->
+    <div id="container"></div>
+    <div id="info">
+        <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Skeletal Animation Blending
+        (model from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">mixamo.com</a>)<br/>
+        Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
+    </div>
+
+    <!-- Import maps polyfill -->
+    <!-- Remove this when import maps will be widely supported -->
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.132.0/build/three.module.js",
+                "three/addons/": "./jsm/"
+            }
+        }
+    </script>
+
+    <script type="module" src="/ThreeJS_Example/learn-threejs-master/chapter-08/js/08-01-model-loader.js"></script>
+</body>
+</html>
