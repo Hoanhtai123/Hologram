@@ -11,667 +11,75 @@
 //     Vector3,
 //     GridHelper
 // } from 'https://unpkg.com/three@0.132.0/build/three.module.js';
-import * as THREE from 'three';
-import { GLTFLoader } from 'https://unpkg.com/three@0.132.0/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'https://unpkg.com/three@0.132.0/examples/jsm/controls/OrbitControls.js';
-import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.16/+esm';
-import Stats from 'https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min.js';
-import * as SkeletonUtils from 'https://unpkg.com/three@0.132.0/examples/jsm/utils/SkeletonUtils.js';
-
-// let scene, renderer, camera, stats;
-// let model, model1, model2, model3, skeleton, mixer, clock;
-
-// const crossFadeControls = [];
-
-// let idleAction, walkAction, runAction;
-// let idleWeight, walkWeight, runWeight;
-// let actions, settings;
-// let stag;
-// let animations;
-
-// let singleStepMode = false;
-// let sizeOfNextStep = 0;
-
-// init();
-
-// function init() {
-
-//     const container = document.getElementById( 'container' );
-//     // document.body.appendChild(renderer.domElement);
-//     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-//     // const orbitControls = new OrbitControls(camera, renderer.domElement);
-//     // orbitControls.update();
-//     camera.position.set( 0, 2, - 3 );
-//     camera.lookAt( 0, 1, 0 );
-
-//     // orbitControls.enableDamping = true;
-
-//     clock = new THREE.Clock();
-
-//     scene = new THREE.Scene();
-//     // scene.background = new THREE.Color( 0x000000 );
-//     // scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
-
-//     const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-//     hemiLight.position.set( 0, 20, 0 );
-//     scene.add( hemiLight );
-
-//     const dirLight = new THREE.DirectionalLight( 0xffffff );
-//     dirLight.position.set( - 3, 10, - 10 );
-//     dirLight.castShadow = true;
-//     dirLight.shadow.camera.top = 2;
-//     dirLight.shadow.camera.bottom = - 2;
-//     dirLight.shadow.camera.left = - 2;
-//     dirLight.shadow.camera.right = 2;
-//     dirLight.shadow.camera.near = 0.1;
-//     dirLight.shadow.camera.far = 40;
-//     scene.add( dirLight );
-
-//     // scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
-
-//     // ground
-
-//     // const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0x000000, depthWrite: false } ) );
-//     // // mesh.rotation.x = - Math.PI / 2;
-//     // // mesh.receiveShadow = true;
-//     // scene.add( mesh );
-
-//     const loader = new GLTFLoader();
-//     loader.load( 'https://threejs.org/examples/models/gltf/Soldier.glb', function ( gltf ) {
-
-//         model = gltf.scene;
-//         model.scale.set(0.3, 0.3, 0.3);
-
-
-//         // model.rotateX(-Math.PI / 2);
-
-//         // scene.add( model );
-//         stag = model;
-//         // scene.add( model2 );
-//         // scene.add( model3 );
-
-//         model.traverse( function ( object ) {
-
-//             if ( object.isMesh ) object.castShadow = true;
-
-//         } );
-
-//         //
-
-//         skeleton = new THREE.SkeletonHelper( model );
-//         skeleton.visible = false;
-//         scene.add( skeleton );
-
-//         //
-
-//         createPanel();
-
-
-//         //
-
-//         animations = gltf.animations;
-
-//         mixer = new THREE.AnimationMixer( model );
-
-//         idleAction = mixer.clipAction( animations[ 0 ] );
-//         walkAction = mixer.clipAction( animations[ 3 ] );
-//         runAction = mixer.clipAction( animations[ 1 ] );
-
-//         actions = [ idleAction, walkAction, runAction ];
-
-//         activateAllActions();
-
-//         animate();
-
-//     } );
-
-//     renderer = new THREE.WebGLRenderer( { antialias: true } );
-//     renderer.setPixelRatio( window.devicePixelRatio );
-//     renderer.setSize( window.innerWidth, window.innerHeight );
-//     renderer.outputEncoding = THREE.sRGBEncoding;
-//     renderer.shadowMap.enabled = true;
-//     container.appendChild( renderer.domElement );
-
-//     stats = new Stats();
-//     container.appendChild( stats.dom );
-
-//     const planeMesh = new THREE.Mesh(
-//         new THREE.PlaneGeometry(20,20),
-//         new THREE.MeshBasicMaterial({
-//             side: THREE.DoubleSide,
-//             visible: false
-//         })
-//     );
-
-//     planeMesh.rotateX(-Math.PI / 2);
-//     scene.add(planeMesh);
-//     planeMesh.name = 'ground';
-//     const grid = new THREE.GridHelper(20,20);
-//     scene.add(grid);
-
-//     const highlightMesh = new THREE.Mesh(
-//         new THREE.PlaneGeometry(1,1),
-//         new THREE.MeshBasicMaterial({
-//             side: THREE.DoubleSide,
-//             transparent: true
-//         })
-//     );
-//     highlightMesh.rotateX(-Math.PI / 2);
-//     highlightMesh.position.set(0.5,0,.5)
-//     scene.add(highlightMesh);
-
-//     const raycaster = new THREE.Raycaster();
-//     const mousePosition = new THREE.Vector2();
-
-//     let intersects;
-
-//     window.addEventListener('mousemove', function(e){
-//         // console.log("HoTai running 123");
-//         mousePosition.x = (e.clientX / this.window.innerWidth) * 2 - 1;
-//         mousePosition.y = -(e.clientY / this.window.innerHeight) * 2 + 1;        
-//         raycaster.setFromCamera(mousePosition, camera);
-//         intersects = raycaster.intersectObjects(scene.children);
-//         intersects.forEach(function(intersect){
-//             if(intersect.object.name === 'ground'){
-//                 const highlightPos = new THREE.Vector3().copy(intersect.point).floor().addScalar(0.5);
-//                 highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
-
-//                 const objectExits = objects.find(function(object){
-//                     return (object.position.x === highlightMesh.position.x)
-//                     &&(object.position.z === highlightMesh.position.z);
-//                 });
-                
-//                 if(!objectExits){
-//                     highlightMesh.material.color.setHex(0x00ffff);
-//                 }
-//                 else{
-//                     highlightMesh.material.color.setHex(0x00ffff);
-//                 }
-//             }
-//         });
-//     });
-
-//     // const sphereMesh = new THREE. Mesh (
-//     //  new THREE.SphereGeometry(0.4, 4, 2),
-//     //  new THREE. MeshBasicMaterial({
-//     //      wireframe: true,
-//     //      color: 0xFFEA00
-//     //  })
-//     // );
-
-//      const objects = [];
-
-//     window.addEventListener('mousedown',function(){
-//         const objectExits = objects.find(function(object){
-//             return (object.position.x === highlightMesh.position.x) && (object.position.z === highlightMesh.position.z);
-//         });
-
-//         if(!objectExits){
-//             intersects.forEach(function(intersect){
-//                 if(intersect.object.name === 'ground'){
-//                     console.log("HoTai running 123", objectExits);
-//                     const stagClone = SkeletonUtils.clone(stag);
-//                     console.log("HoTai running 1234", objectExits);
-//                     stagClone.position.copy(highlightMesh.position);
-//                     scene.add(stagClone);
-//                 }
-//             });
-//         }
-        
-//     })
-
-
-//     const orbitControls = new OrbitControls(camera, renderer.domElement);
-//     orbitControls.update();
-
-//     window.addEventListener( 'resize', onWindowResize );
-
-// }
-// function testAnimation(){
-//     highlightMesh.material.opacity = 1 + Math.sin(time / 120);
-//     renderer.render(scene, camera);
-// }
-
-// function createPanel() {
-
-//     const panel = new GUI( { width: 310 } );
-
-//     const folder1 = panel.addFolder( 'Visibility' );
-//     const folder2 = panel.addFolder( 'Activation/Deactivation' );
-//     const folder3 = panel.addFolder( 'Pausing/Stepping' );
-//     const folder4 = panel.addFolder( 'Crossfading' );
-//     const folder5 = panel.addFolder( 'Blend Weights' );
-//     const folder6 = panel.addFolder( 'General Speed' );
-
-//     settings = {
-//         'show model': true,
-//         'show skeleton': false,
-//         'deactivate all': deactivateAllActions,
-//         'activate all': activateAllActions,
-//         'pause/continue': pauseContinue,
-//         'make single step': toSingleStepMode,
-//         'modify step size': 0.05,
-//         'from walk to idle': function () {
-
-//             prepareCrossFade( walkAction, idleAction, 1.0 );
-
-//         },
-//         'from idle to walk': function () {
-
-//             prepareCrossFade( idleAction, walkAction, 0.5 );
-
-//         },
-//         'from walk to run': function () {
-
-//             prepareCrossFade( walkAction, runAction, 2.5 );
-
-//         },
-//         'from run to walk': function () {
-
-//             prepareCrossFade( runAction, walkAction, 5.0 );
-
-//         },
-//         'use default duration': true,
-//         'set custom duration': 3.5,
-//         'modify idle weight': 0.0,
-//         'modify walk weight': 1.0,
-//         'modify run weight': 0.0,
-//         'modify time scale': 1.0
-//     };
-
-//     folder1.add( settings, 'show model' ).onChange( showModel );
-//     folder1.add( settings, 'show skeleton' ).onChange( showSkeleton );
-//     folder2.add( settings, 'deactivate all' );
-//     folder2.add( settings, 'activate all' );
-//     folder3.add( settings, 'pause/continue' );
-//     folder3.add( settings, 'make single step' );
-//     folder3.add( settings, 'modify step size', 0.01, 0.1, 0.001 );
-//     crossFadeControls.push( folder4.add( settings, 'from walk to idle' ) );
-//     crossFadeControls.push( folder4.add( settings, 'from idle to walk' ) );
-//     crossFadeControls.push( folder4.add( settings, 'from walk to run' ) );
-//     crossFadeControls.push( folder4.add( settings, 'from run to walk' ) );
-//     folder4.add( settings, 'use default duration' );
-//     folder4.add( settings, 'set custom duration', 0, 10, 0.01 );
-//     folder5.add( settings, 'modify idle weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) {
-
-//         setWeight( idleAction, weight );
-
-//     } );
-//     folder5.add( settings, 'modify walk weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) {
-
-//         setWeight( walkAction, weight );
-
-//     } );
-//     folder5.add( settings, 'modify run weight', 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) {
-
-//         setWeight( runAction, weight );
-
-//     } );
-//     folder6.add( settings, 'modify time scale', 0.0, 1.5, 0.01 ).onChange( modifyTimeScale );
-
-//     folder1.open();
-//     folder2.open();
-//     folder3.open();
-//     folder4.open();
-//     folder5.open();
-//     folder6.open();
-
-// }
-
-
-// function showModel( visibility ) {
-
-//     model.visible = visibility;
-
-// }
-
-
-// function showSkeleton( visibility ) {
-
-//     skeleton.visible = visibility;
-
-// }
-
-
-// function modifyTimeScale( speed ) {
-
-//     mixer.timeScale = speed;
-
-// }
-
-
-// function deactivateAllActions() {
-
-//     actions.forEach( function ( action ) {
-
-//         action.stop();
-
-//     } );
-
-// }
-
-// function activateAllActions() {
-
-//     setWeight( idleAction, settings[ 'modify idle weight' ] );
-//     setWeight( walkAction, settings[ 'modify walk weight' ] );
-//     setWeight( runAction, settings[ 'modify run weight' ] );
-
-//     actions.forEach( function ( action ) {
-
-//         action.play();
-
-//     } );
-
-// }
-
-// function pauseContinue() {
-
-//     if ( singleStepMode ) {
-
-//         singleStepMode = false;
-//         unPauseAllActions();
-
-//     } else {
-
-//         if ( idleAction.paused ) {
-
-//             unPauseAllActions();
-
-//         } else {
-
-//             pauseAllActions();
-
-//         }
-
-//     }
-
-// }
-
-// function pauseAllActions() {
-
-//     actions.forEach( function ( action ) {
-
-//         action.paused = true;
-
-//     } );
-
-// }
-
-// function unPauseAllActions() {
-
-//     actions.forEach( function ( action ) {
-
-//         action.paused = false;
-
-//     } );
-
-// }
-
-// function toSingleStepMode() {
-
-//     unPauseAllActions();
-
-//     singleStepMode = true;
-//     sizeOfNextStep = settings[ 'modify step size' ];
-
-// }
-
-// function prepareCrossFade( startAction, endAction, defaultDuration ) {
-
-//     // Switch default / custom crossfade duration (according to the user's choice)
-
-//     const duration = setCrossFadeDuration( defaultDuration );
-
-//     // Make sure that we don't go on in singleStepMode, and that all actions are unpaused
-
-//     singleStepMode = false;
-//     unPauseAllActions();
-
-//     // If the current action is 'idle' (duration 4 sec), execute the crossfade immediately;
-//     // else wait until the current action has finished its current loop
-
-//     if ( startAction === idleAction ) {
-
-//         executeCrossFade( startAction, endAction, duration );
-
-//     } else {
-
-//         synchronizeCrossFade( startAction, endAction, duration );
-
-//     }
-
-// }
-
-// function setCrossFadeDuration( defaultDuration ) {
-
-//     // Switch default crossfade duration <-> custom crossfade duration
-
-//     if ( settings[ 'use default duration' ] ) {
-
-//         return defaultDuration;
-
-//     } else {
-
-//         return settings[ 'set custom duration' ];
-
-//     }
-
-// }
-
-// function synchronizeCrossFade( startAction, endAction, duration ) {
-
-//     mixer.addEventListener( 'loop', onLoopFinished );
-
-//     function onLoopFinished( event ) {
-
-//         if ( event.action === startAction ) {
-
-//             mixer.removeEventListener( 'loop', onLoopFinished );
-
-//             executeCrossFade( startAction, endAction, duration );
-
-//         }
-
-//     }
-
-// }
-
-// function executeCrossFade( startAction, endAction, duration ) {
-
-//     // Not only the start action, but also the end action must get a weight of 1 before fading
-//     // (concerning the start action this is already guaranteed in this place)
-
-//     setWeight( endAction, 1 );
-//     endAction.time = 0;
-
-//     // Crossfade with warping - you can also try without warping by setting the third parameter to false
-
-//     startAction.crossFadeTo( endAction, duration, true );
-
-// }
-
-// // This function is needed, since animationAction.crossFadeTo() disables its start action and sets
-// // the start action's timeScale to ((start animation's duration) / (end animation's duration))
-
-// function setWeight( action, weight ) {
-
-//     action.enabled = true;
-//     action.setEffectiveTimeScale( 1 );
-//     action.setEffectiveWeight( weight );
-
-// }
-
-// // Called by the render loop
-
-// function updateWeightSliders() {
-
-//     settings[ 'modify idle weight' ] = idleWeight;
-//     settings[ 'modify walk weight' ] = walkWeight;
-//     settings[ 'modify run weight' ] = runWeight;
-
-// }
-
-// // Called by the render loop
-
-// function updateCrossFadeControls() {
-
-//     if ( idleWeight === 1 && walkWeight === 0 && runWeight === 0 ) {
-
-//         crossFadeControls[ 0 ].disable();
-//         crossFadeControls[ 1 ].enable();
-//         crossFadeControls[ 2 ].disable();
-//         crossFadeControls[ 3 ].disable();
-
-//     }
-
-//     if ( idleWeight === 0 && walkWeight === 1 && runWeight === 0 ) {
-
-//         crossFadeControls[ 0 ].enable();
-//         crossFadeControls[ 1 ].disable();
-//         crossFadeControls[ 2 ].enable();
-//         crossFadeControls[ 3 ].disable();
-
-//     }
-
-//     if ( idleWeight === 0 && walkWeight === 0 && runWeight === 1 ) {
-
-//         crossFadeControls[ 0 ].disable();
-//         crossFadeControls[ 1 ].disable();
-//         crossFadeControls[ 2 ].disable();
-//         crossFadeControls[ 3 ].enable();
-
-//     }
-
-// }
-
-// function onWindowResize() {
-
-//     camera.aspect = window.innerWidth / window.innerHeight;
-//     camera.updateProjectionMatrix();
-
-//     renderer.setSize( window.innerWidth, window.innerHeight );
-
-// }
-
-// function animate() {
-
-//     // Render loop
-
-//     requestAnimationFrame( animate );
-
-//     idleWeight = idleAction.getEffectiveWeight();
-//     walkWeight = walkAction.getEffectiveWeight();
-//     runWeight = runAction.getEffectiveWeight();
-
-//     // Update the panel values if weights are modified from "outside" (by crossfadings)
-
-//     updateWeightSliders();
-
-//     // Enable/disable crossfade controls according to current weight values
-
-//     updateCrossFadeControls();
-
-//     // Get the time elapsed since the last frame, used for mixer update (if not in single step mode)
-
-//     let mixerUpdateDelta = clock.getDelta();
-
-//     // If in single step mode, make one step and then do nothing (until the user clicks again)
-
-//     if ( singleStepMode ) {
-
-//         mixerUpdateDelta = sizeOfNextStep;
-//         sizeOfNextStep = 0;
-
-//     }
-
-//     // Update the animation mixer, the stats panel, and render this frame
-
-//     mixer.update( mixerUpdateDelta );
-
-//     stats.update();
-
-//     renderer.render( scene, camera );
-
-// }
-
-// const modelUrl = new URL('../assets/Stag.gltf', import.meta.url);
-
-//     const container = document.getElementById( 'container' );
-//     // document.body.appendChild(renderer.domElement);
-//     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-//     // const orbitControls = new OrbitControls(camera, renderer.domElement);
-//     // orbitControls.update();
-//     camera.position.set( 0, 2, - 3 );
-//     camera.lookAt( 0, 1, 0 );
-
-//     // orbitControls.enableDamping = true;
-
-//     clock = new THREE.Clock();
-
-//     scene = new THREE.Scene();
-//     // scene.background = new THREE.Color( 0x000000 );
-//     // scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
-
-//     const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-//     hemiLight.position.set( 0, 20, 0 );
-//     scene.add( hemiLight );
-
-//     const dirLight = new THREE.DirectionalLight( 0xffffff );
-//     dirLight.position.set( - 3, 10, - 10 );
-//     dirLight.castShadow = true;
-//     dirLight.shadow.camera.top = 2;
-//     dirLight.shadow.camera.bottom = - 2;
-//     dirLight.shadow.camera.left = - 2;
-//     dirLight.shadow.camera.right = 2;
-//     dirLight.shadow.camera.near = 0.1;
-//     dirLight.shadow.camera.far = 40;
-//     scene.add( dirLight );
-
-const renderer = new THREE.WebGLRenderer({antialias: true});
-
+import * as THREE from "three";
+import { GLTFLoader } from "https://unpkg.com/three@0.132.0/examples/jsm/loaders/GLTFLoader.js";
+import { OrbitControls } from "https://unpkg.com/three@0.132.0/examples/jsm/controls/OrbitControls.js";
+import GUI from "https://cdn.jsdelivr.net/npm/lil-gui@0.16/+esm";
+import Stats from "https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min.js";
+import * as SkeletonUtils from "https://unpkg.com/three@0.132.0/examples/jsm/utils/SkeletonUtils.js";
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-renderer.setClearColor(0xA3A3A3);
+renderer.setClearColor(0xa3a3a3);
 
-renderer.shadowMap.enabled = true
+renderer.shadowMap.enabled = true;
 
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(
-    45,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-);
+scene.background = new THREE.Color(0x000000);
 
+const camera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+const keyboardInput = document.getElementById("keyboard-input");
+// keydown, keypress, keyup
+document.addEventListener("keydown", (event) => {
+  console.log(event);
+  if (event.key == "a") {
+    keyboardInput.value += event.key;
+  }
+  if (event.key == "w") {
+    keyboardInput.value += event.key;
+  }
+  if (event.key == "s") {
+    keyboardInput.value += event.key;
+  }
+  if (event.key == "d") {
+    keyboardInput.value += event.key;
+  }
+});
 
 // CONTROLS
 const orbit = new OrbitControls(camera, renderer.domElement);
 
-camera.position.set(10, 6, 10);
+camera.position.set(0, 10, 0);
 orbit.update();
 
-    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-    hemiLight.position.set( 0, 20, 0 );
-    scene.add( hemiLight );
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
+hemiLight.position.set(0, 20, 0);
+scene.add(hemiLight);
 
-    const dirLight = new THREE.DirectionalLight( 0xffffff );
-    dirLight.position.set( - 3, 10, - 10 );
-    dirLight.castShadow = true;
-    dirLight.shadow.camera.top = 2;
-    dirLight.shadow.camera.bottom = - 2;
-    dirLight.shadow.camera.left = - 2;
-    dirLight.shadow.camera.right = 2;
-    dirLight.shadow.camera.near = 0.1;
-    dirLight.shadow.camera.far = 40;
-    scene.add( dirLight );
+const dirLight = new THREE.DirectionalLight(0xffffff);
+dirLight.position.set(-3, 10, -10);
+dirLight.castShadow = true;
+dirLight.shadow.camera.top = 2;
+dirLight.shadow.camera.bottom = -2;
+dirLight.shadow.camera.left = -2;
+dirLight.shadow.camera.right = 2;
+dirLight.shadow.camera.near = 0.1;
+dirLight.shadow.camera.far = 40;
+scene.add(dirLight);
 const ambientLight = new THREE.AmbientLight(0x333333);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 scene.add(directionalLight);
 directionalLight.position.set(3, 3, 3);
 
@@ -680,35 +88,40 @@ const assetLoader = new GLTFLoader();
 // let mixer;
 let stag;
 let clips;
-assetLoader.load('https://threejs.org/examples/models/gltf/Soldier.glb', function(gltf) {
+assetLoader.load(
+  "https://threejs.org/examples/models/gltf/Soldier.glb",
+  function (gltf) {
     const model = gltf.scene;
-    model.scale.set(0.3, 0.3, 0.3);
+    model.scale.set(0.6, 0.6, 0.6);
     // scene.add(model);
     stag = model;
     clips = gltf.animations;
-}, undefined, function(error) {
+  },
+  undefined,
+  function (error) {
     console.error(error);
-});
+  }
+);
 
 const planeMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(20, 20),
-    new THREE.MeshBasicMaterial({
-        side: THREE.DoubleSide,
-        visible: false
-    })
+  new THREE.PlaneGeometry(20, 20),
+  new THREE.MeshBasicMaterial({
+    side: THREE.DoubleSide,
+    visible: false,
+  })
 );
 planeMesh.rotateX(-Math.PI / 2);
 scene.add(planeMesh);
 
-const grid = new THREE.GridHelper(20, 20);
-scene.add(grid);
+// const grid = new THREE.GridHelper(20, 20);
+// scene.add(grid);
 
 const highlightMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(1, 1),
-    new THREE.MeshBasicMaterial({
-        side: THREE.DoubleSide,
-        transparent: true
-    })
+  new THREE.PlaneGeometry(1, 1),
+  new THREE.MeshBasicMaterial({
+    side: THREE.DoubleSide,
+    transparent: true,
+  })
 );
 highlightMesh.rotateX(-Math.PI / 2);
 highlightMesh.position.set(0.5, 0, 0.5);
@@ -718,25 +131,28 @@ const mousePosition = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
 let intersects;
 
-window.addEventListener('mousemove', function(e) {
-    mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
-    mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(mousePosition, camera);
-    intersects = raycaster.intersectObject(planeMesh);
-        if(intersects.length > 0) {
-            const highlightPos = new THREE.Vector3().copy(intersects[0].point).floor().addScalar(0.5);
-            highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
+window.addEventListener("mousemove", function (e) {
+  mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mousePosition, camera);
+  intersects = raycaster.intersectObject(planeMesh);
+  if (intersects.length > 0) {
+    const highlightPos = new THREE.Vector3()
+      .copy(intersects[0].point)
+      .floor()
+      .addScalar(0.5);
+    highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
 
-            const objectExist = objects.find(function(object) {
-                return (object.position.x === highlightMesh.position.x)
-                && (object.position.z === highlightMesh.position.z)
-            });
+    const objectExist = objects.find(function (object) {
+      return (
+        object.position.x === highlightMesh.position.x &&
+        object.position.z === highlightMesh.position.z
+      );
+    });
 
-            if(!objectExist)
-                highlightMesh.material.color.setHex(0xFFFFFF);
-            else
-                highlightMesh.material.color.setHex(0xFF0000);
-        }
+    if (!objectExist) highlightMesh.material.color.setHex(0xffffff);
+    else highlightMesh.material.color.setHex(0xff0000);
+  }
 });
 
 // const sphereMesh = new THREE.Mesh(
@@ -746,56 +162,77 @@ window.addEventListener('mousemove', function(e) {
 //         color: 0xFFEA00
 //     })
 // );
-
+let num = 0;
 const objects = [];
 const mixers = [];
-window.addEventListener('mousedown', function() {
-    console.log("Hotai addEventListener: ")
-    const objectExist = objects.find(function(object) {
-        return (object.position.x === highlightMesh.position.x)
-        && (object.position.z === highlightMesh.position.z)
-    });
+window.addEventListener("mousedown", function () {
+  console.log("Hotai addEventListener: ");
+  const objectExist = objects.find(function (object) {
+    return (
+      object.position.x === highlightMesh.position.x &&
+      object.position.z === highlightMesh.position.z
+    );
+  });
 
-    if(!objectExist) {
-        console.log("Hotai objectExist: ", !objectExist)
-        if(intersects.length > 0) {
-            const stagClone = SkeletonUtils.clone(stag);
-            stagClone.position.copy(highlightMesh.position);
-            scene.add(stagClone);
-            objects.push(stagClone);
-            highlightMesh.material.color.setHex(0xFF0000);
-
-            const mixer = new THREE.AnimationMixer(stagClone);
-            console.log("Hotai animations: ", clips[ 3 ] )
-            const action = mixer.clipAction(clips[ 3 ]);
-            action.play();
-            mixers.push(mixer);
+  if (!objectExist) {
+    console.log("Hotai objectExist: ", !objectExist);
+    if (intersects.length > 0) {
+      const stagClone = SkeletonUtils.clone(stag);
+      stagClone.position.copy(highlightMesh.position);
+      stagClone.rotateZ(-Math.PI / 2);
+      if (num < 4 && num > 0) {
+        switch (num) {
+          case 1:
+            stagClone.rotateX(-Math.PI / 2);
+            break;
+          case 2:
+            for (let i = 0; i < num; i++) {
+              stagClone.rotateX(-Math.PI / 2);
+            }
+            break;
+          case 3:
+            for (let i = 0; i < num; i++) {
+              stagClone.rotateX(-Math.PI / 2);
+            }
+            break;
         }
+      }
+      scene.add(stagClone);
+      objects.push(stagClone);
+      highlightMesh.material.color.setHex(0xff0000);
+
+      const mixer = new THREE.AnimationMixer(stagClone);
+      console.log("Hotai animations: ", clips[3]);
+      const action = mixer.clipAction(clips[3]);
+      action.play();
+      mixers.push(mixer);
     }
-    console.log(scene.children.length);
+  }
+  console.log(scene.children.length);
+  num++;
 });
 
 const clock = new THREE.Clock();
 function animate(time) {
-    highlightMesh.material.opacity = 1 + Math.sin(time / 120);
-    // objects.forEach(function(object) {
-    //     object.rotation.x = time / 1000;
-    //     object.rotation.z = time / 1000;
-    //     object.position.y = 0.5 + 0.5 * Math.abs(Math.sin(time / 1000));
-    // });
-    // if(mixer)
-    //     mixer.update(clock.getDelta());
-    const delta = clock.getDelta();
-    mixers.forEach(function(mixer) {
-        mixer.update(delta);
-    });
-    renderer.render(scene, camera);
+  highlightMesh.material.opacity = 1 + Math.sin(time / 120);
+  // objects.forEach(function(object) {
+  //     object.rotation.x = time / 1000;
+  //     object.rotation.z = time / 1000;
+  //     object.position.y = 0.5 + 0.5 * Math.abs(Math.sin(time / 1000));
+  // });
+  // if(mixer)
+  //     mixer.update(clock.getDelta());
+  const delta = clock.getDelta();
+  mixers.forEach(function (mixer) {
+    mixer.update(delta);
+  });
+  renderer.render(scene, camera);
 }
 
 renderer.setAnimationLoop(animate);
 
-window.addEventListener('resize', function() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+window.addEventListener("resize", function () {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 });
